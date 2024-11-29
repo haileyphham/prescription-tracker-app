@@ -1,10 +1,10 @@
 import { Image, StyleSheet } from "react-native";
 import { useContext, useEffect, useState } from "react";
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { UserContext } from "@/components/UserContext";
+import { HelloWave } from "@/components/components/HelloWave";
+import ParallaxScrollView from "@/components/components/ParallaxScrollView";
+import { ThemedText } from "@/components/components/ThemedText";
+import { ThemedView } from "@/components/components/ThemedView";
+import { UserContext } from "@/components/components/UserContext";
 import { Card, Text } from "@rneui/base";
 
 function MedicationDispenseCard({

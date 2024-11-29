@@ -17,6 +17,7 @@ const defaultUserContext: UserContextType = {
 interface UserContextType {
     user: typeof USER_ID;
     setUser: Dispatch<SetStateAction<typeof USER_ID>>;
+    name?: string; 
 }
 
 const UserContext = createContext<UserContextType>(defaultUserContext);
