@@ -1,27 +1,33 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Tabs } from 'expo-router';
-import { TabBarIcon } from '@/components/navigation/TabBarIcon'; // Assuming you have a custom TabBarIcon component
-import { useColorScheme } from '@/hooks/useColorScheme'; // Hook to get the current color scheme
+import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { UserContext } from '@/components/components/UserContext'; 
+import { LoginScreen } from '../LoginScreen';  
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme(); // Get the current color scheme
+  const colorScheme = useColorScheme();
+  const { user } = useContext(UserContext);  // Get the user state from context
 
-  // Manually define colors for active and inactive states
-  const activeColorLight = '#0056b3';  // Dark blue for active tab (light mode)
-  const inactiveColorLight = '#A0B1D8'; // Lighter blue for inactive tab (light mode)
+  // If the user is not logged in, show the login screen
+  if (!user) {
+    return <LoginScreen />;  
+  }
 
-  const activeColorDark = '#0066cc';   // Dark blue for active tab (dark mode)
-  const inactiveColorDark = '#888888'; // Grey for inactive tab (dark mode)
 
-  // Determine the active and inactive color based on the theme
+  const activeColorLight = '#0056b3';
+  const inactiveColorLight = '#A0B1D8';
+  const activeColorDark = '#0066cc';
+  const inactiveColorDark = '#888888';
+
   const activeColor = colorScheme === 'dark' ? activeColorDark : activeColorLight;
   const inactiveColor = colorScheme === 'dark' ? inactiveColorDark : inactiveColorLight;
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: activeColor, // Active tab color
-        tabBarInactiveTintColor: inactiveColor, // Inactive tab color
+        tabBarActiveTintColor: activeColor,
+        tabBarInactiveTintColor: inactiveColor,
         headerShown: false, // Disable header for tab screens
       }}
     >
@@ -33,7 +39,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               name={focused ? 'home' : 'home-outline'}
-              color={focused ? activeColor : inactiveColor} // Set color based on focused state
+              color={focused ? activeColor : inactiveColor}
             />
           ),
         }}
@@ -47,7 +53,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               name={focused ? 'calendar' : 'calendar-outline'}
-              color={focused ? activeColor : inactiveColor} // Set color based on focused state
+              color={focused ? activeColor : inactiveColor}
             />
           ),
         }}
@@ -61,7 +67,21 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               name={focused ? 'add-circle' : 'add-circle-outline'}
-              color={focused ? activeColor : inactiveColor} // Set color based on focused state
+              color={focused ? activeColor : inactiveColor}
+            />
+          ),
+        }}
+      />
+
+      {/* Data Storage tab */}
+      <Tabs.Screen
+        name="DataStoreScreen"
+        options={{
+          title: 'Saved Medications',
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon
+              name={focused ? 'add-circle' : 'add-circle-outline'}
+              color={focused ? activeColor : inactiveColor}
             />
           ),
         }}

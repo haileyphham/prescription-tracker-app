@@ -1,140 +1,159 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
-// Sample medication data, each associated with a specific date
-const medications = [
-  {
-    id: '1',
-    name: 'Aspirin',
-    dose: '100mg',
-    pills: 30,
-    type: 'pill',
-    details: 'Take one tablet with food every 4-6 hours as needed for pain.',
-    date: '2024-11-13',
-  },
-  {
-    id: '2',
-    name: 'Ibuprofen',
-    dose: '200mg',
-    pills: 20,
-    type: 'pill',
-    details: 'Take one tablet every 4-6 hours for pain relief. Do not exceed 6 tablets in 24 hours.',
-    date: '2024-11-14',
-  },
-  {
-    id: '3',
-    name: 'Liquid Paracetamol',
-    dose: '150mg',
-    pills: 0,
-    type: 'liquid',
-    details: 'Take 15ml every 4-6 hours for fever or pain relief.',
-    date: '2024-11-14',
-  },
-  {
-    id: '4',
-    name: 'Topical Cream',
-    dose: '50mg',
-    pills: 0,
-    type: 'topical',
-    details: 'Apply a thin layer to the affected area twice daily.',
-    date: '2024-11-15',
-  },
-];
+interface Medication {
+  id: string;
+  medicationName: string;
+  startDate: string;
+  medicationType: 'pill' | 'liquid' | 'topical';
+  pillsInPack: number;
+  frequency: string;
+  period: string;
+  specialNotes: string;
+  takeTime: string;
+}
 
 const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [markedDates, setMarkedDates] = useState<Record<string, any>>({});
+  const [takenMedications, setTakenMedications] = useState<Set<string>>(new Set());
   const [expanded, setExpanded] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const loadMedications = async () => {
+      try {
+        const storedMedications = await AsyncStorage.getItem('medications');
+        if (storedMedications) {
+          const medicationsArray: Medication[] = JSON.parse(storedMedications);
+          setMedications(medicationsArray);
+
+          const dates = medicationsArray.reduce<Record<string, any>>(
+            (acc, med) => {
+              const date = med.startDate;
+              acc[date] = { marked: true, selectedColor: '#123d87' };
+              return acc;
+            },
+            {}
+          );
+          setMarkedDates(dates);
+        }
+      } catch (error) {
+        console.error('Error loading medications from AsyncStorage:', error);
+      }
+    };
+
+    loadMedications();
+  }, []);
 
   const handleDayPress = (day: { dateString: string }) => {
     setSelectedDate(day.dateString);
   };
 
-  // Function to return the correct icon based on medication type
   const getMedicationIcon = (type: string) => {
     switch (type) {
       case 'pill':
-        return <MaterialCommunityIcons name="pill" size={24} color="#FFFFFF" />;
+        return <MaterialCommunityIcons name="pill" size={30} color='#FFFFFF' />;
       case 'liquid':
-        return <MaterialCommunityIcons name="beaker" size={24} color="#FFFFFF" />;
+        return <MaterialCommunityIcons name="beaker" size={30} color='#FFFFFF' />;
       case 'topical':
-        return <MaterialCommunityIcons name="lotion-plus-outline" size={24} color="#FFFFFF" />;
+        return <MaterialCommunityIcons name="lotion-plus-outline" size={30} color='#FFFFFF' />;
       default:
-        return <MaterialCommunityIcons name="help-circle" size={24} color="#FFFFFF" />;
+        return <MaterialCommunityIcons name="help-circle" size={30} color='#FFFFFF' />;
     }
   };
 
-  const toggleExpand = (id: string) => {
-    setExpanded((prev) => (prev === id ? null : id));
+  const handleCheckToggle = (medicationName: string) => {
+    const updatedSet = new Set(takenMedications);
+    if (updatedSet.has(medicationName)) {
+      updatedSet.delete(medicationName);
+    } else {
+      updatedSet.add(medicationName);
+    }
+    setTakenMedications(updatedSet);
   };
 
-  // Get a list of medications for the selected date
-  const medicationsForSelectedDate = medications.filter((med) => med.date === selectedDate);
+  const medicationsForSelectedDate = medications.filter((med) => med.startDate === selectedDate);
 
-  // Mark the dates that have scheduled medications
-  const markedDates = medications.reduce<Record<string, { marked: boolean, selectedColor: string }>>(
-    (acc, med) => {
-      acc[med.date] = { marked: true, selectedColor: '#123d87' }; // Blue for marked dates
-      return acc;
-    },
-    {} // Initial empty object
-  );
+  const totalMedications = medicationsForSelectedDate.length;
+  const takenProgress = (takenMedications.size * 100) / totalMedications;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Medication Calendar</Text>
-      
+      {/* Title above the calendar */}
+      <Text style={styles.monthTitle}>This Month:</Text>
+
+      {/* Calendar */}
       <Calendar
         markedDates={markedDates}
         onDayPress={handleDayPress}
         style={styles.calendar}
         theme={{
-          arrowColor: '#123d87', // Set the arrows color to green
-          todayTextColor: '#123d87', // Highlight today's date in green
-          monthTextColor: '#123d87', // Set the month text to green
-          dayTextColor: '#123d87', // Set the day text to blue
-          textSectionTitleColor: '#123d87', // Set the section title color to green
-          selectedDayBackgroundColor: '#123d87', // Set the selected day background to green
-          selectedDayTextColor: '#ffffff', // Set the selected day text to white
-          todayBackgroundColor: '#c1d5f7', // Set the background color for today's date
+          arrowColor: '#123d87',
+          todayTextColor: '#123d87',
+          monthTextColor: '#123d87',
+          dayTextColor: '#123d87',
+          textSectionTitleColor: '#123d87',
+          selectedDayBackgroundColor: '#123d87',
+          selectedDayTextColor: '#ffffff',
+          todayBackgroundColor: '#c1d5f7',
           dotColor: '#123d87',
         }}
       />
-      
+
+      {/* Medication List */}
       <ScrollView contentContainerStyle={styles.medicationsContainer}>
         {selectedDate && medicationsForSelectedDate.length > 0 && (
-          <>
-            <Text style={styles.selectedDate}>Medications for {selectedDate}</Text>
-            <FlatList
-              data={medicationsForSelectedDate}
-              renderItem={({ item }) => (
-                <View style={styles.medicationBox}>
-                  <View style={styles.medicationHeader}>
-                    {getMedicationIcon(item.type)}
-                    <View style={styles.medicationInfo}>
-                      <Text style={styles.medicationName}>{item.name}</Text>
-                      <Text style={styles.medicationDose}>{item.dose} - {item.pills > 0 ? `${item.pills} Pills` : 'No Pills'}</Text>
-                    </View>
-                    <TouchableOpacity onPress={() => toggleExpand(item.id)}>
-                      <AntDesign name="ellipsis1" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
-                  </View>
-
-                  {expanded === item.id && (
-                    <View style={styles.medicationDetails}>
-                      <Text style={styles.medicationDetailsText}>{item.details}</Text>
-                    </View>
-                  )}
-                </View>
-              )}
-              keyExtractor={(item) => item.id}
-            />
-          </>
+          <Text style={styles.selectedDate}>Medications for {selectedDate}</Text>
         )}
+        <FlatList
+          data={medicationsForSelectedDate}
+          renderItem={({ item }) => {
+            const isChecked = takenMedications.has(item.medicationName);
+            return (
+              <View style={styles.medicationBox}>
+                <View style={styles.medicationHeader}>
+                  {getMedicationIcon(item.medicationType)}
+                  <View style={styles.medicationInfo}>
+                    <Text style={styles.medicationName}>{item.medicationName}</Text>
+                    <Text style={styles.medicationDose}>{item.pillsInPack} Pills - {item.frequency}</Text>
+                  </View>
+                  <TouchableOpacity onPress={() => handleCheckToggle(item.medicationName)}>
+                    <Ionicons
+                      name={isChecked ? "checkmark-circle" : "checkmark-circle-outline"}
+                      size={30}
+                      color={isChecked ? '#123d87' : '#DDD'}
+                    />
+                  </TouchableOpacity>
+                </View>
+                {expanded === item.id && (
+                  <View style={styles.medicationDetails}>
+                    <Text style={styles.medicationDetailsText}>Start Date: {item.startDate}</Text>
+                    <Text style={styles.medicationDetailsText}>Type: {item.medicationType}</Text>
+                    <Text style={styles.medicationDetailsText}>Frequency: {item.frequency} times per day</Text>
+                    <Text style={styles.medicationDetailsText}>Period: {item.period} days</Text>
+                    <Text style={styles.medicationDetailsText}>Special Notes: {item.specialNotes}</Text>
+                    <Text style={styles.medicationDetailsText}>Time of Day: {item.takeTime}</Text>
+                  </View>
+                )}
+              </View>
+            );
+          }}
+          keyExtractor={(item) => item.id}
+        />
       </ScrollView>
 
-      <TouchableOpacity style={styles.addButton}>
+      {/* Add Medication Button */}
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => router.push('./AddMedicationScreen')}
+      >
         <Text style={styles.addButtonText}>Add Medication</Text>
       </TouchableOpacity>
     </View>
@@ -144,29 +163,28 @@ const CalendarScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#edf4ff',
     padding: 16,
-    backgroundColor: '#c1d5f7',
   },
-  title: {
+  monthTitle: {
     fontSize: 30,
     fontWeight: 'bold',
     color: '#123d87',
-    marginBottom: 20,
+    marginBottom: 10,
     padding: 20,
   },
   calendar: {
-    backgroundColor: "#FFFFFF" , // Match calendar background to the page background color
+    backgroundColor: "#FFFFFF",
     borderRadius: 18,
-    marginBottom: 20,
-    height: 450, // Increase the height of the calendar
-    width: 'auto',
+    marginBottom: 30,
+    height: 450,
     padding: 30,
-    
-
+    borderColor: '#123d87',
+    borderWidth: 2,
   },
   medicationsContainer: {
-    flexGrow: 1,  // Allow scrolling content inside the container
-    marginBottom: 70,  // Ensure there's space for the Add Medication button
+    flexGrow: 1,
+    marginBottom: 60,
   },
   selectedDate: {
     fontSize: 25,
@@ -182,9 +200,11 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 2,
+    borderColor: '#123d87', 
+    borderWidth: 2,
   },
   medicationHeader: {
     flexDirection: 'row',
@@ -197,11 +217,11 @@ const styles = StyleSheet.create({
   },
   medicationName: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 20,
     color: '#FFFFFF',
   },
   medicationDose: {
-    fontSize: 14,
+    fontSize: 17,
     color: '#FFFFFF',
   },
   medicationDetails: {
@@ -213,18 +233,19 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   addButton: {
-    position: 'absolute',
-    bottom: 20,
-    left: '50%',
-    transform: [{ translateX: -90 }], // Center the button horizontally
     backgroundColor: '#123d87',
     padding: 15,
-    borderRadius: 18,
-    width: 180, // Set a fixed width for the button
+    borderRadius: 50,
     alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 30,
+    left: 30,
+    right: 30,
   },
   addButtonText: {
-    color: '#FFFFFF',
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });
