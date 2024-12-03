@@ -48,3 +48,18 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+
+## Overview / Screenshots 📸
+
+| Login Screen | Home Screen | Home Screen Features | Calendar Screen|
+|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|
+|<img src="./assets/screenshots/Login.png" width="200" />|<img src="./assets/screenshots/HomePage.png" width="200" />|<img src="./assets/screenshots/HomePage2.png" width="200" />|<img src="./assets/screenshots/CalenderScreen1.png" width="200" />|
+
+| Calendar Dropdown | Set Reminders | Add Medications | Medication Selection |
+|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|
+|<img src="./assets/screenshots/CalenderScreen2.png" width="200" />|<img src="./assets/screenshots/Reminder" width="200" />|<img src="./assets/screenshots/AddMedications.png" width="200" />|<img src="./assets/screenshots/Dropdown.png" width="200" />|
+
+| Add Medication Details | Saved Medications |
+|:-------------------------:|:-------------------------:|
+|<img src="./assets/screenshots/AddMedsFeatures.png" width="200" />|<img src="./assets/screenshots/SavedMedications.png" width="200" />|
