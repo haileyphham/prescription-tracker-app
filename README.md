@@ -54,12 +54,12 @@ Join our community of developers creating universal apps.
 
 | Login Screen | Home Screen | Home Screen Features | Calendar Screen|
 |:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|
-|<img src="./assets/screenshots/Login.png" width="200" />|<img src="./assets/screenshots/HomePage.png" width="200" />|<img src="./assets/screenshots/HomePage2.png" width="200" />|<img src="./assets/screenshots/CalenderScreen1.png" width="200" />|
+|<img src="./assets/screenshots/Login.jpeg" width="200" />|<img src="./assets/screenshots/HomePage.jpeg" width="200" />|<img src="./assets/screenshots/HomePage2.jpeg" width="200" />|<img src="./assets/screenshots/CalenderScreen1.jpeg" width="200" />|
 
 | Calendar Dropdown | Set Reminders | Add Medications | Medication Selection |
 |:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|
-|<img src="./assets/screenshots/CalenderScreen2.png" width="200" />|<img src="./assets/screenshots/Reminder" width="200" />|<img src="./assets/screenshots/AddMedications.png" width="200" />|<img src="./assets/screenshots/Dropdown.png" width="200" />|
+|<img src="./assets/screenshots/CalenderScreen2.jpeg" width="200" />|<img src="./assets/screenshots/Reminder.jpeg" width="200" />|<img src="./assets/screenshots/AddMedications.jpeg" width="200" />|<img src="./assets/screenshots/Dropdown.jpeg" width="200" />|
 
 | Add Medication Details | Saved Medications |
 |:-------------------------:|:-------------------------:|
-|<img src="./assets/screenshots/AddMedsFeatures.png" width="200" />|<img src="./assets/screenshots/SavedMedications.png" width="200" />|
+|<img src="./assets/screenshots/AddMedsFeatures.jpeg" width="200" />|<img src="./assets/screenshots/SavedMedications.jpeg" width="200" />|
